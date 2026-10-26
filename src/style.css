@@ -107,3 +107,22 @@
     font-size: 14px;
   }
 }
+/* Anand Electricals: contact, service and offer section */
+.contact-services { padding: 64px clamp(18px, 5vw, 76px); background: #f8f8f3; }
+.offer-banner { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:24px 0; }
+.offer-banner > div { display:flex; flex-direction:column; gap:7px; padding:20px; border-radius:14px; background:#fff4cc; border:1px solid #f0df9e; }
+.offer-banner strong { color:#20231f; font-size:17px; }
+.offer-banner span { color:#686c63; font-size:13px; line-height:1.6; }
+.contact-service-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+.contact-service-card { display:flex; flex-direction:column; align-items:flex-start; gap:12px; padding:22px; border:1px solid #e4e6dd; border-radius:15px; background:#fff; min-width:0; }
+.contact-service-icon { display:grid; place-items:center; width:46px; height:46px; border-radius:12px; color:#8c6a10; background:#fff2c4; }
+.contact-service-card h3 { margin:0; font-size:17px; color:var(--ink,#20231f); }
+.contact-service-card p { margin:0 0 5px; color:#6f746b; font-size:13px; line-height:1.7; overflow-wrap:anywhere; flex:1; }
+.contact-service-card .primary-btn, .contact-service-card .outline-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; text-align:center; min-height:44px; text-decoration:none; }
+.contact-disclaimer { margin:18px 0 0; color:#777c72; font-size:12px; line-height:1.7; }
+@media (max-width: 950px) { .contact-service-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width: 600px) {
+  .contact-services { padding:42px 14px; }
+  .offer-banner, .contact-service-grid { grid-template-columns:1fr; }
+  .contact-service-card { padding:18px; }
+}
