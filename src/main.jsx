@@ -406,7 +406,7 @@ function App() {
         <a className="brand" href="#home" aria-label="Anand Electricals home">
           <img
             className="brand-logo"
-            src="/anand_logo.png"
+            src="/anand-logo.png"
             alt="Anand Electricals logo"
           />
           <span className="brand-copy">
@@ -746,7 +746,7 @@ function App() {
 
       <footer>
         <a className="brand footer-brand" href="#home">
-          <img className="brand-logo footer-logo" src="/anand_logo.png" alt="Anand Electricals logo" />
+          <img className="brand-logo footer-logo" src="/anand-logo.png" alt="Anand Electricals logo" />
           <span className="brand-copy"><strong>ANAND</strong><small>ELECTRICALS</small></span>
         </a>
         <p>Electrical essentials for everyday living.</p>
