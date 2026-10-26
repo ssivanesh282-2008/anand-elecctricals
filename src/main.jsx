@@ -7,6 +7,12 @@ import './style.css';
 const envOk = Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
 const supabase = envOk ? createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY) : null;
 const WA = (import.meta.env.VITE_SHOP_WHATSAPP || '919865551358').replace(/\D/g, '');
+const SHOP_ADDRESS = 'R.R. Theatre Road, Pollachi, Tamil Nadu 642001';
+const MAPS_URL = 'https://share.google/4LNiEZtxgUxfR7jPo';
+const SHOP_PHONE = '+919865551358';
+const serviceLink = (service) => `https://wa.me/${WA}?text=${encodeURIComponent(
+  `Hello Anand Electricals! I would like to enquire about ${service} service.\nName: \nAddress/location: \nPreferred date/time: `
+)}`;
 const money = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(Number(n)||0);
 const demoProducts = [
  {id:'demo1',name:'LED Bulb 9W',category:'Lighting',price:120,description:'Energy-saving LED bulb for everyday use.',image_url:'',active:true},
@@ -27,7 +33,7 @@ function App(){
  useEffect(()=>{if(!supabase)return; loadProducts(); supabase.auth.getSession().then(({data})=>setSession(data.session)); const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,s)=>setSession(s));return()=>subscription.unsubscribe();},[]);
  function add(p){setCart(c=>({...c,[String(p.id)]:(c[String(p.id)]||0)+1}));say(`${p.name} added to cart`)}
  function changeQty(id,delta){setCart(c=>{const next={...c},n=(next[id]||0)+delta;if(n<=0)delete next[id];else next[id]=n;return next;});}
- function checkout(){if(!cartItems.length)return;const lines=cartItems.map(({product,qty})=>`• ${product.name} x ${qty} — ${money(product.price*qty)}`);const msg=`Hello Anand Electricals! I would like to place an order:\n\n${lines.join('\n')}\n\n*Estimated total: ${money(total)}*\n\nPlease confirm availability and final amount.\nName: \nDelivery/pickup: `;window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank','noopener,noreferrer');}
+ function checkout(){if(!cartItems.length)return;const lines=cartItems.map(({product,qty})=>`• ${product.name} x ${qty} — ${money(product.price*qty)}`);const msg=`Hello Anand Electricals! I would like to place an order:\n\n${lines.join('\n')}\n\n*Estimated total: ${money(total)}*\n\nPlease confirm availability and final amount.\n\nOffer information: Free delivery on orders above ₹999. Free fan fitting is available (please confirm eligibility and appointment with the shop).\nName: \nDelivery address/pickup: `;window.open(`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`,'_blank','noopener,noreferrer');}
  async function login(e){e.preventDefault();if(!supabase)return;setLoading(true);const {error}=await supabase.auth.signInWithPassword({email,password});setLoading(false);if(error)say(error.message);else{setPassword('');say('Signed in. Admin access depends on your account role.');}}
  async function logout(){await supabase.auth.signOut();setEditing(null);say('Signed out');}
  function openNew(){setEditing('new');setForm({name:'',category:'Lighting',price:'',description:'',image_url:'',active:true});setImageFile(null);}
@@ -45,7 +51,38 @@ function App(){
  <section id="products" className="catalogue"><div className="section-heading"><div><span className="eyebrow">OUR CATALOGUE</span><h2>Find what you need<span>.</span></h2><p>Browse our products and see prices before you order.</p></div><div className="product-count"><strong>{filtered.length.toString().padStart(2,'0')}</strong><span>products shown</span></div></div><div className="catalog-tools"><div className="searchbox"><Search size={19}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search bulbs, switches, wires..." aria-label="Search products"/><kbd>⌕</kbd></div><div className="category-scroll">{categories.map(c=><button key={c} className={category===c?'category active':'category'} onClick={()=>setCategory(c)}>{c}</button>)}</div></div>{!configured&&<div className="setup-notice"><strong>Preview mode:</strong> These are sample products. Connect Supabase using the README setup instructions to save your real catalogue and enable admin features.</div>}
  <div className="product-grid">{filtered.map(p=><article className="product-card" key={p.id}><div className="product-image">{p.image_url?<img src={p.image_url} alt={p.name} loading="lazy"/>:<div className="image-placeholder"><span><Zap size={36}/></span><small>ANAND ELECTRICALS</small></div>}<span className="product-category">{p.category}</span>{isAdmin&&<div className="manage-buttons"><button onClick={()=>openEdit(p)} title="Edit"><Pencil size={15}/></button><button onClick={()=>deleteProduct(p)} title="Delete"><Trash2 size={15}/></button></div>}</div><div className="product-info"><h3>{p.name}</h3><p>{p.description||'Quality electrical product for your everyday needs.'}</p><div className="product-bottom"><div><small>PRICE</small><strong>{money(p.price)}</strong></div><button className="add-button" onClick={()=>add(p)}><Plus size={17}/><span>Add</span></button></div></div></article>)}</div>{filtered.length===0&&<div className="empty-state"><Package size={36}/><h3>No products found</h3><p>Try a different search or category.</p></div>}
  {isAdmin&&<button className="add-product-floating" onClick={openNew}><Plus size={18}/> Add new product</button>}</section>
- <section id="about" className="about-strip"><div className="about-symbol"><Zap size={32} fill="currentColor"/></div><div><span className="eyebrow">YOUR NEIGHBOURHOOD ELECTRICAL STORE</span><h2>Good products. Straightforward service.</h2><p>Visit or contact Anand Electricals in Pollachi for product availability, pricing and order confirmation.</p></div><a href={`https://wa.me/${WA}`} target="_blank" rel="noreferrer" className="outline-btn"><MessageCircle size={17}/> Contact us</a></section></main>
+ <section id="about" className="about-strip"><div className="about-symbol"><Zap size={32} fill="currentColor"/></div><div><span className="eyebrow">YOUR NEIGHBOURHOOD ELECTRICAL STORE</span><h2>Good products. Straightforward service.</h2><p>Visit or contact Anand Electricals in Pollachi for product availability, pricing and order confirmation.</p></div><a href={`https://wa.me/${WA}`} target="_blank" rel="noreferrer" className="outline-btn"><MessageCircle size={17}/> Contact us</a></section>
+  <section id="contact" className="contact-services">
+    <div className="section-heading"><div><span className="eyebrow">VISIT OR CONTACT US</span><h2>Local service, made simple<span>.</span></h2><p>Contact Anand Electricals for electrical products and home-service enquiries.</p></div></div>
+    <div className="offer-banner">
+      <div><strong>Free fan fitting</strong><span>Ask us to confirm fitting availability and appointment.</span></div>
+      <div><strong>Free delivery above ₹999</strong><span>For eligible orders; confirm delivery area with the shop.</span></div>
+    </div>
+    <div className="contact-service-grid">
+      <article className="contact-service-card">
+        <span className="contact-service-icon"><MapPin size={23}/></span>
+        <h3>Visit our shop</h3><p>{SHOP_ADDRESS}</p>
+        <a className="primary-btn" href={MAPS_URL} target="_blank" rel="noreferrer"><MapPin size={17}/> Get directions</a>
+      </article>
+      <article className="contact-service-card">
+        <span className="contact-service-icon"><MessageCircle size={23}/></span>
+        <h3>Call or WhatsApp</h3><p>Speak with Anand Electricals about products, prices and delivery.</p>
+        <a className="primary-btn" href={`tel:${SHOP_PHONE}`}><span>Call +91 98655 51358</span></a>
+        <a className="outline-btn" href={`https://wa.me/${WA}`} target="_blank" rel="noreferrer"><MessageCircle size={17}/> WhatsApp us</a>
+      </article>
+      <article className="contact-service-card">
+        <span className="contact-service-icon"><Zap size={23}/></span>
+        <h3>Electrician service</h3><p>Send your location and describe the electrical work needed.</p>
+        <a className="primary-btn" href={serviceLink('electrician')} target="_blank" rel="noreferrer"><MessageCircle size={17}/> Request electrician</a>
+      </article>
+      <article className="contact-service-card">
+        <span className="contact-service-icon"><Package size={23}/></span>
+        <h3>Plumber service</h3><p>Send your location and describe the plumbing work needed.</p>
+        <a className="primary-btn" href={serviceLink('plumber')} target="_blank" rel="noreferrer"><MessageCircle size={17}/> Request plumber</a>
+      </article>
+    </div>
+    <p className="contact-disclaimer">Service availability, fan-fitting eligibility, delivery coverage and final charges are confirmed by the shop.</p>
+  </section></main>
  <footer><a className="brand footer-brand" href="#home"><span className="brand-mark"><Zap size={22} fill="currentColor"/></span><span><strong>Anand Electricals</strong><small>POWERING POLLACHI</small></span></a><p>Electrical essentials for everyday living.</p><span>© {new Date().getFullYear()} Anand Electricals · Pollachi, Tamil Nadu</span></footer>
  {notice&&<div className="toast" role="status">{notice}</div>}
  {cartOpen&&<div className="overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setCartOpen(false)}}><aside className="drawer"><div className="drawer-head"><div><span className="eyebrow">YOUR SELECTION</span><h2>Shopping cart <span>({count})</span></h2></div><button className="icon-button" onClick={()=>setCartOpen(false)} aria-label="Close cart"><X/></button></div>{cartItems.length===0?<div className="empty-cart"><ShoppingCart size={46}/><h3>Your cart is empty</h3><p>Add products to start your order.</p><button className="primary-btn" onClick={()=>setCartOpen(false)}>Browse products</button></div>:<><div className="cart-lines">{cartItems.map(({product,qty})=><div className="cart-line" key={product.id}><div className="cart-thumb">{product.image_url?<img src={product.image_url} alt=""/>:<Zap/>}</div><div className="cart-line-info"><strong>{product.name}</strong><span>{money(product.price)} each</span><b>{money(product.price*qty)}</b><div className="qty-controls"><button onClick={()=>changeQty(String(product.id),-1)} aria-label="Decrease quantity"><Minus size={14}/></button><span>{qty}</span><button onClick={()=>changeQty(String(product.id),1)} aria-label="Increase quantity"><Plus size={14}/></button></div></div><button className="remove-line" onClick={()=>setCart(c=>{const n={...c};delete n[String(product.id)];return n})} aria-label="Remove item"><Trash2 size={17}/></button></div>)}</div><div className="cart-summary"><div><span>Subtotal</span><strong>{money(total)}</strong></div><p>Final price and availability will be confirmed by the shop on WhatsApp.</p><button className="checkout-btn" onClick={checkout}><MessageCircle size={19}/> Proceed to WhatsApp <ArrowRight size={18}/></button><button className="continue-btn" onClick={()=>setCartOpen(false)}>Continue shopping</button></div></>}</aside></div>}
